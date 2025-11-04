@@ -609,7 +609,6 @@ public class WebTester : IAsyncDisposable
                     if (!string.IsNullOrWhiteSpace(textContent) &&
                         System.Text.RegularExpressions.Regex.IsMatch(textContent, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                     {
-                        Log($"Excluding element with text '{textContent.Trim()}' (matches pattern: {pattern})");
                         return true;
                     }
 
@@ -617,7 +616,6 @@ public class WebTester : IAsyncDisposable
                     if (!string.IsNullOrWhiteSpace(href) &&
                         System.Text.RegularExpressions.Regex.IsMatch(href, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                     {
-                        Log($"Excluding element with href '{href}' (matches pattern: {pattern})");
                         return true;
                     }
                 }
