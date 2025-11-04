@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "TestManiac configuration for testing a web application with login",
+  "baseUrl": "https://your-app.com",
+  "username": "test-user@example.com",
+  "password": "YourSecurePassword123",
+  "usernameSelector": null,
+  "passwordSelector": null,
+  "loginButtonSelector": null,
+  "maxPagesToCrawl": 30,
+  "maxDepth": 4,
+  "navigationTimeout": 30000,
+  "headless": false,
+  "browserType": "Chromium",
+  "interactionDelay": 1000,
+  "screenshotOnError": true,
+  "screenshotPath": "./test-screenshots",
+  "excludeUrls": [],
+  "excludeLoginPage": true
+}

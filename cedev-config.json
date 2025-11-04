@@ -1,0 +1,22 @@
+{
+  "baseUrl": "http://cedev-web-ce-ui.mscorp.com/Auto1",
+  "username": "SuperAdmin",
+  "password": "$uperAdmin_1",
+  "usernameSelector": null,
+  "passwordSelector": null,
+  "loginButtonSelector": null,
+  "maxPagesToCrawl": 50,
+  "maxDepth": 5,
+  "navigationTimeout": 30000,
+  "headless": false,
+  "browserType": "chromium",
+  "interactionDelay": 500,
+  "screenshotOnError": true,
+  "screenshotPath": "./screenshots",
+  "excludeUrls": [
+    "/login",
+    "/logout",
+    "/signout"
+  ],
+  "excludeLoginPage": true
+}
