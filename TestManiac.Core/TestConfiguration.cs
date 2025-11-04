@@ -161,6 +161,17 @@ public class TestConfiguration
     /// Useful for testing sites with self-signed certificates
     /// </summary>
     public bool IgnoreSslErrors { get; set; } = false;
+
+    /// <summary>
+    /// List of regex patterns to exclude elements from clicking
+    /// Patterns are matched against element text content and href attribute (case-insensitive)
+    /// Example: "log.*out", "(?:delete|remove)", "sign.*out", "/logout"
+    /// </summary>
+    public List<string> ExcludeElementPatterns { get; set; } = new List<string>
+    {
+        @"(?i)log\s*out",
+        @"(?i)sign\s*out"
+    };
 }
 
 /// <summary>

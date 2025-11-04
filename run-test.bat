@@ -50,6 +50,7 @@ echo   --modal-dialog-selector ^<s^>  CSS selector for modal containers
 echo   --modal-close-selector ^<s^>   CSS selector for modal close buttons
 echo   --exclude-url ^<pattern^>      URL pattern to exclude from testing
 echo   --exclude-login-page         Exclude login page from testing
+echo   --exclude-element-pattern ^<regex^> Regex pattern to exclude elements from clicking
 echo   --ignore-ssl-errors          Ignore SSL certificate errors
 echo   --no-screenshots             Disable screenshots
 echo.

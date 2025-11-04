@@ -106,6 +106,7 @@ Options:
   --modal-close-selector <sel>   CSS selector for modal close buttons (can be used multiple times)
   --exclude-url <pattern>        URL pattern to exclude (can be used multiple times)
   --exclude-login-page [bool]    Exclude login page from testing (default: true)
+  --exclude-element-pattern <rx> Regex pattern to exclude elements from clicking (can be used multiple times)
   --ignore-ssl-errors [bool]     Ignore SSL certificate errors (default: false)
   --no-screenshots               Disable screenshots on errors
   -h, --help                     Show help message
@@ -147,6 +148,31 @@ dotnet run --project TestManiac.CLI -- --url https://example.com --browser firef
 
 # Use WebKit (Safari engine)
 dotnet run --project TestManiac.CLI -- --url https://example.com --browser webkit
+```
+
+#### Excluding Elements from Clicking
+
+```bash
+# Exclude logout buttons/links (case-insensitive regex)
+# Matches both text content and href attributes
+dotnet run --project TestManiac.CLI -- \
+  --url https://example.com \
+  --exclude-element-pattern "(?i)log.*out" \
+  --exclude-element-pattern "(?i)sign.*out" \
+  --visible
+
+# Exclude by URL patterns (for links)
+dotnet run --project TestManiac.CLI -- \
+  --url https://example.com \
+  --exclude-element-pattern "/logout" \
+  --exclude-element-pattern "/signout" \
+  --visible
+
+# Exclude delete/remove actions
+dotnet run --project TestManiac.CLI -- \
+  --url https://example.com \
+  --exclude-element-pattern "(?i)(delete|remove)" \
+  --visible
 ```
 
 #### Using Configuration File
@@ -191,6 +217,13 @@ Create a JSON file with your test configuration:
   ],
   "excludeUrls": ["/logout", "/admin/*"],
   "excludeLoginPage": true,
+  "excludeElementPatterns": [
+    "(?i)log\\s*out",
+    "(?i)sign\\s*out",
+    "/logout",
+    "/signout",
+    "(?i)(delete|remove)"
+  ],
   "ignoreSslErrors": false
 }
 ```

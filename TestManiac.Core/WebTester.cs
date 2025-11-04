@@ -557,7 +557,11 @@ public class WebTester : IAsyncDisposable
 
                             if (isVisible && isEnabled)
                             {
-                                elements.Add(elem);
+                                // Check if element text matches any exclusion patterns
+                                if (!await ShouldExcludeElement(elem))
+                                {
+                                    elements.Add(elem);
+                                }
                             }
                         }
                         catch
@@ -578,6 +582,57 @@ public class WebTester : IAsyncDisposable
         }
 
         return elements;
+    }
+
+    /// <summary>
+    /// Check if an element should be excluded based on text content patterns
+    /// </summary>
+    private async Task<bool> ShouldExcludeElement(IElementHandle element)
+    {
+        if (_config.ExcludeElementPatterns == null || _config.ExcludeElementPatterns.Count == 0)
+            return false;
+
+        try
+        {
+            // Get element text content
+            var textContent = await element.TextContentAsync();
+            
+            // Get href attribute if it's a link
+            var href = await element.GetAttributeAsync("href");
+
+            // Check against each exclusion pattern
+            foreach (var pattern in _config.ExcludeElementPatterns)
+            {
+                try
+                {
+                    // Check text content
+                    if (!string.IsNullOrWhiteSpace(textContent) && 
+                        System.Text.RegularExpressions.Regex.IsMatch(textContent, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    {
+                        Log($"Excluding element with text '{textContent.Trim()}' (matches pattern: {pattern})");
+                        return true;
+                    }
+
+                    // Check href attribute
+                    if (!string.IsNullOrWhiteSpace(href) && 
+                        System.Text.RegularExpressions.Regex.IsMatch(href, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                    {
+                        Log($"Excluding element with href '{href}' (matches pattern: {pattern})");
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log($"Invalid regex pattern '{pattern}': {ex.Message}");
+                }
+            }
+        }
+        catch
+        {
+            // If we can't get text content or href, don't exclude
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -56,6 +56,7 @@ class Program
             Console.WriteLine($"  Modal Close Selectors: {(config.ModalCloseSelectors.Count > 0 ? string.Join(", ", config.ModalCloseSelectors) : "none")}");
             Console.WriteLine($"  Exclude URLs: {(config.ExcludeUrls.Count > 0 ? string.Join(", ", config.ExcludeUrls) : "none")}");
             Console.WriteLine($"  Exclude Login Page: {config.ExcludeLoginPage}");
+            Console.WriteLine($"  Exclude Element Patterns: {(config.ExcludeElementPatterns.Count > 0 ? string.Join(", ", config.ExcludeElementPatterns) : "none")}");
             Console.WriteLine($"  Ignore SSL Errors: {config.IgnoreSslErrors}");
             Console.WriteLine();
 
@@ -310,6 +311,11 @@ class Program
                         config.IgnoreSslErrors = true; // Default to true if no value provided
                     break;
 
+                case "--exclude-element-pattern":
+                    if (i + 1 < args.Length)
+                        config.ExcludeElementPatterns.Add(args[++i]);
+                    break;
+
                 case "--help":
                 case "-h":
                     return null;
@@ -407,6 +413,7 @@ class Program
         Console.WriteLine("  --modal-close-selector <sel>   CSS selector for modal close buttons (can be used multiple times)");
         Console.WriteLine("  --exclude-url <pattern>        URL pattern to exclude (can be used multiple times)");
         Console.WriteLine("  --exclude-login-page [bool]    Exclude login page from testing (default: true)");
+        Console.WriteLine("  --exclude-element-pattern <rx> Regex pattern to exclude elements from clicking (can be used multiple times)");
         Console.WriteLine("  --ignore-ssl-errors [bool]     Ignore SSL certificate errors (default: false)");
         Console.WriteLine("  -h, --help                     Show this help message");
         Console.WriteLine();
@@ -418,6 +425,11 @@ class Program
         Console.WriteLine("    --username-selector \"#username\" \\");
         Console.WriteLine("    --password-selector \"#password\" \\");
         Console.WriteLine("    --login-button \"button[type='submit']\"");
+        Console.WriteLine();
+        Console.WriteLine("  TestManiac.CLI --url https://example.com \\");
+        Console.WriteLine("    --exclude-element-pattern \"(?i)log.*out\" \\");
+        Console.WriteLine("    --exclude-element-pattern \"(?i)delete\" \\");
+        Console.WriteLine("    --visible");
         Console.WriteLine();
         Console.WriteLine("  TestManiac.CLI config.json");
     }

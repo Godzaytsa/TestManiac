@@ -82,6 +82,17 @@ dotnet run --project TestManiac.CLI -- ^
   --visible
 ```
 
+### Test with element exclusions (avoid clicking logout, delete, etc.)
+
+```bash
+dotnet run --project TestManiac.CLI -- ^
+  --url https://yoursite.com ^
+  --exclude-element-pattern "(?i)log.*out" ^
+  --exclude-element-pattern "/logout" ^
+  --exclude-element-pattern "(?i)(delete|remove)" ^
+  --visible
+```
+
 ### Headless mode (no browser window)
 
 ```bash
@@ -109,9 +120,10 @@ dotnet run --project TestManiac.CLI -- mytest.json
 5. **Auto-close modals** - Use `--auto-close-modals` to prevent HTML modal dialogs from blocking tests
 6. **SSL issues** - Use `--ignore-ssl-errors` for sites with self-signed or invalid certificates
 7. **Network timing** - Use `--wait-network-idle` (default: true) to wait for API calls before checking errors
-8. **Check the results** - Look at the generated `test-results_*.json` file
-9. **Screenshots** - Check the `screenshots/` folder if errors occur
-10. **Get help** - Run `dotnet run --project TestManiac.CLI -- --help`
+8. **Exclude elements** - Use `--exclude-element-pattern "(?i)log.*out"` to avoid clicking logout/delete buttons
+9. **Check the results** - Look at the generated `test-results_*.json` file
+10. **Screenshots** - Check the `screenshots/` folder if errors occur
+11. **Get help** - Run `dotnet run --project TestManiac.CLI -- --help`
 
 ## Finding CSS Selectors for Login
 

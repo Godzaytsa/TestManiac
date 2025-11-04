@@ -61,6 +61,7 @@ Holds all configuration parameters:
 - Dialog handler action (accept, dismiss, ignore)
 - Auto-close modal settings (enabled, dialog selectors, close selectors)
 - URL exclusion patterns
+- Element exclusion patterns (regex for element text)
 - SSL certificate error handling
 
 ### 2. WebTester Class
