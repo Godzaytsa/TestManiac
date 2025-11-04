@@ -17,6 +17,7 @@
   "networkIdleTimeout": 10000,
   "screenshotOnError": true,
   "screenshotPath": "./screenshots",
+  "resultsPath": null,
   "excludeUrls": [
     "/login",
     "/logout",

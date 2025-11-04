@@ -99,6 +99,11 @@ public class TestConfiguration
     public string ScreenshotPath { get; set; } = "./screenshots";
 
     /// <summary>
+    /// Path to save test results JSON files (default: current directory)
+    /// </summary>
+    public string? ResultsPath { get; set; }
+
+    /// <summary>
     /// List of URL patterns to exclude from testing (supports wildcards)
     /// </summary>
     public List<string> ExcludeUrls { get; set; } = new();

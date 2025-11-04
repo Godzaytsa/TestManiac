@@ -67,7 +67,17 @@ class Program
             var summary = await tester.RunTestsAsync();
 
             // Save results to JSON file
-            var resultsPath = $"test-results_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            var resultsFileName = $"test-results_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            var resultsPath = !string.IsNullOrEmpty(config.ResultsPath)
+                ? Path.Combine(config.ResultsPath, resultsFileName)
+                : resultsFileName;
+
+            // Ensure results directory exists
+            if (!string.IsNullOrEmpty(config.ResultsPath))
+            {
+                Directory.CreateDirectory(config.ResultsPath);
+            }
+
             await SaveResultsAsync(summary, resultsPath);
             Console.WriteLine($"\n✓ Results saved to: {resultsPath}");
 
@@ -211,6 +221,11 @@ class Program
                         config.ScreenshotPath = args[++i];
                     break;
 
+                case "--results-path":
+                    if (i + 1 < args.Length)
+                        config.ResultsPath = args[++i];
+                    break;
+
                 case "--no-screenshots":
                     config.ScreenshotOnError = false;
                     break;
@@ -313,6 +328,7 @@ class Program
         Console.WriteLine("  --delay <ms>                   Delay between interactions in ms (default: 500)");
         Console.WriteLine("  --timeout <ms>                 Navigation timeout in ms (default: 30000)");
         Console.WriteLine("  --screenshot-path <path>       Path to save screenshots (default: ./screenshots)");
+        Console.WriteLine("  --results-path <path>          Path to save test results JSON (default: current directory)");
         Console.WriteLine("  --no-screenshots               Disable screenshots on errors");
         Console.WriteLine("  --exclude-url <pattern>        URL pattern to exclude (can be used multiple times)");
         Console.WriteLine("  --exclude-login-page [bool]    Exclude login page from testing (default: true)");

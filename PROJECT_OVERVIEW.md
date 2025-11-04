@@ -55,7 +55,8 @@ Holds all configuration parameters:
 - Browser configuration (type, headless mode)
 - Crawling limits (max pages, max depth)
 - Timing settings (timeouts, delays, click timeout)
-- Screenshot settings
+- Screenshot settings (path, on error)
+- Results output path
 - Network idle detection settings
 - URL exclusion patterns
 
@@ -252,14 +253,14 @@ It also monitors:
    - Exclude login page option
    - Start URL configuration
 
-6. **Reporting**
+7. **Reporting**
 
    - Real-time console output with detailed element info
    - Detailed JSON reports
    - Success/failure statistics
    - Combined before/after screenshot gallery
 
-7. **Configuration**
+8. **Configuration**
    - Command-line arguments
    - JSON configuration files
    - Flexible parameter options

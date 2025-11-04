@@ -95,6 +95,7 @@ Options:
   --timeout <ms>                 Navigation timeout in ms (default: 30000)
   --click-timeout <ms>           Click timeout in ms (default: 5000)
   --screenshot-path <path>       Path to save screenshots (default: ./screenshots)
+  --results-path <path>          Path to save test results JSON (default: current directory)
   --no-screenshots               Disable screenshots on errors
   -h, --help                     Show help message
 ```
@@ -109,6 +110,9 @@ dotnet run --project TestManiac.CLI -- --url https://example.com --visible
 
 # Test with limited pages and depth
 dotnet run --project TestManiac.CLI -- --url https://example.com --max-pages 20 --max-depth 3
+
+# Save results to a specific folder
+dotnet run --project TestManiac.CLI -- --url https://example.com --results-path "./test-results" --visible
 ```
 
 #### Testing with Login
@@ -165,6 +169,7 @@ Create a JSON file with your test configuration:
   "networkIdleTimeout": 10000,
   "screenshotOnError": true,
   "screenshotPath": "./screenshots",
+  "resultsPath": "./test-results",
   "excludeUrls": ["/logout", "/admin/*"],
   "excludeLoginPage": true
 }
@@ -261,6 +266,7 @@ A detailed JSON file (`test-results_TIMESTAMP.json`) containing:
 ### Screenshots
 
 When errors occur, the tool captures:
+
 - **Before screenshot**: Shows the page with the clicked element highlighted in red
 - **After screenshot**: Shows the page state after the error occurred
 - **Combined screenshot**: Both images side-by-side with "BEFORE" and "AFTER" labels
@@ -274,7 +280,8 @@ Screenshots are saved to the specified directory with descriptive filenames.
 3. **Adjust Delays**: Increase `--delay` for slower websites or complex interactions
 4. **Domain Scope**: The tool only crawls pages within the same domain as the base URL
 5. **Login Selectors**: Use browser DevTools to find the correct CSS selectors for login fields
-6. **Review Results**: Always check the JSON report and screenshots for detailed analysis
+6. **Organize Results**: Use `--results-path` to save test results in a dedicated folder
+7. **Review Results**: Always check the JSON report and screenshots for detailed analysis
 
 ## Troubleshooting
 
