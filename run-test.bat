@@ -29,6 +29,9 @@ echo   --url ^<url^>                  Base URL to test
 echo   --start-url ^<url^>            Start testing from this URL
 echo   --username ^<username^>        Login username
 echo   --password ^<password^>        Login password
+echo   --username-selector ^<sel^>    CSS selector for username field
+echo   --password-selector ^<sel^>    CSS selector for password field
+echo   --login-button ^<sel^>         CSS selector for login button
 echo   --max-pages ^<number^>         Maximum pages to crawl (default: 50)
 echo   --max-depth ^<number^>         Maximum navigation depth (default: 5)
 echo   --browser ^<type^>             Browser: chromium, firefox, webkit
@@ -37,9 +40,17 @@ echo   --headless ^<true^|false^>      Run in headless mode
 echo   --delay ^<ms^>                 Delay between interactions
 echo   --timeout ^<ms^>               Navigation timeout
 echo   --click-timeout ^<ms^>         Click timeout
+echo   --wait-network-idle          Wait for network idle after clicks
+echo   --network-idle-timeout ^<ms^>  Network idle timeout
 echo   --screenshot-path ^<path^>     Screenshots folder
 echo   --results-path ^<path^>        Results JSON folder
 echo   --dialog-handler ^<action^>    Handle dialogs: accept, dismiss, ignore
+echo   --auto-close-modals          Auto-close HTML modal dialogs
+echo   --modal-dialog-selector ^<s^>  CSS selector for modal containers
+echo   --modal-close-selector ^<s^>   CSS selector for modal close buttons
+echo   --exclude-url ^<pattern^>      URL pattern to exclude from testing
+echo   --exclude-login-page         Exclude login page from testing
+echo   --ignore-ssl-errors          Ignore SSL certificate errors
 echo   --no-screenshots             Disable screenshots
 echo.
 exit /b 1

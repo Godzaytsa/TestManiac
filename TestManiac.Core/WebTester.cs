@@ -54,7 +54,7 @@ public class WebTester : IAsyncDisposable
         _context = await _browser.NewContextAsync(new()
         {
             ViewportSize = new() { Width = 1920, Height = 1080 },
-            IgnoreHTTPSErrors = true
+            IgnoreHTTPSErrors = _config.IgnoreSslErrors
         });
 
         _page = await _context.NewPageAsync();
@@ -363,6 +363,12 @@ public class WebTester : IAsyncDisposable
                         {
                             throw; // Re-throw other exceptions
                         }
+                    }
+
+                    // Close any modal dialogs that appeared
+                    if (_config.AutoCloseModals)
+                    {
+                        await CloseModalsAsync();
                     }
 
                     // Check for errors after interaction
@@ -893,6 +899,93 @@ public class WebTester : IAsyncDisposable
         catch
         {
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Attempt to close any open modal dialogs
+    /// </summary>
+    private async Task CloseModalsAsync()
+    {
+        if (_page == null) return;
+
+        try
+        {
+            // First, find all visible modal dialogs
+            var foundModals = new List<ILocator>();
+
+            foreach (var modalSelector in _config.ModalDialogSelectors)
+            {
+                try
+                {
+                    var modals = await _page.Locator(modalSelector).AllAsync();
+
+                    foreach (var modal in modals)
+                    {
+                        if (await modal.IsVisibleAsync())
+                        {
+                            foundModals.Add(modal);
+                            Log($"Found visible modal dialog: {modalSelector}");
+                        }
+                    }
+                }
+                catch
+                {
+                    // Selector might not match anything, continue
+                    continue;
+                }
+            }
+
+            // For each found modal, try to find and click close button inside it
+            foreach (var modal in foundModals)
+            {
+                bool closed = false;
+
+                foreach (var closeSelector in _config.ModalCloseSelectors)
+                {
+                    if (closed) break;
+
+                    try
+                    {
+                        // Search for close button WITHIN the modal
+                        var closeButton = modal.Locator(closeSelector).First;
+
+                        if (await closeButton.IsVisibleAsync())
+                        {
+                            Log($"  Clicking close button inside modal: {closeSelector}");
+                            await closeButton.ClickAsync(new() { Timeout = 2000 });
+
+                            // Wait a bit for the modal to close
+                            await Task.Delay(500);
+
+                            // Verify modal is actually closed
+                            if (!await modal.IsVisibleAsync())
+                            {
+                                Log($"  ✓ Modal closed successfully");
+                                closed = true;
+                            }
+                            else
+                            {
+                                Log($"  ⚠ Modal still visible after clicking close button");
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // Close button might not exist with this selector, try next
+                        continue;
+                    }
+                }
+
+                if (!closed)
+                {
+                    Log($"  ⚠ Could not find working close button for modal");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"Error closing modals: {ex.Message}");
         }
     }
 

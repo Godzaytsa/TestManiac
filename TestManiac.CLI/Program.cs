@@ -34,9 +34,12 @@ class Program
             Console.WriteLine($"  Browser: {config.BrowserType}");
             Console.WriteLine($"  Headless: {config.Headless}");
             Console.WriteLine($"  Base URL: {config.BaseUrl}");
-            Console.WriteLine($"  Start URL: {config.StartUrl ?? string.Empty}");
-            Console.WriteLine($"  Username: {config.Username ?? string.Empty}");
-            Console.WriteLine($"  Password: {(string.IsNullOrEmpty(config.Password) ? string.Empty : "********")}");
+            Console.WriteLine($"  Start URL: {config.StartUrl ?? "none"}");
+            Console.WriteLine($"  Username: {config.Username ?? "none"}");
+            Console.WriteLine($"  Password: {(string.IsNullOrEmpty(config.Password) ? "none" : "********")}");
+            Console.WriteLine($"  Username Selector: {config.UsernameSelector ?? "none"}");
+            Console.WriteLine($"  Password Selector: {config.PasswordSelector ?? "none"}");
+            Console.WriteLine($"  Login Button Selector: {config.LoginButtonSelector ?? "none"}");
             Console.WriteLine($"  Max Pages: {config.MaxPagesToCrawl}");
             Console.WriteLine($"  Max Depth: {config.MaxDepth}");
             Console.WriteLine($"  Interaction Delay: {config.InteractionDelay}ms");
@@ -45,9 +48,15 @@ class Program
             Console.WriteLine($"  Wait for Network Idle: {config.WaitForNetworkIdle}");
             Console.WriteLine($"  Network Idle Timeout: {config.NetworkIdleTimeout}ms");
             Console.WriteLine($"  Screenshot on Error: {config.ScreenshotOnError}");
-            Console.WriteLine($"  Screenshot Path: {config.ScreenshotPath ?? string.Empty}");
-            Console.WriteLine($"  Results Path: {config.ResultsPath ?? string.Empty}");
+            Console.WriteLine($"  Screenshot Path: {config.ScreenshotPath ?? "none"}");
+            Console.WriteLine($"  Results Path: {config.ResultsPath ?? "none"}");
             Console.WriteLine($"  Dialog Handler: {config.DialogHandler}");
+            Console.WriteLine($"  Auto Close Modals: {config.AutoCloseModals}");
+            Console.WriteLine($"  Modal Dialog Selectors: {(config.ModalDialogSelectors.Count > 0 ? string.Join(", ", config.ModalDialogSelectors) : "none")}");
+            Console.WriteLine($"  Modal Close Selectors: {(config.ModalCloseSelectors.Count > 0 ? string.Join(", ", config.ModalCloseSelectors) : "none")}");
+            Console.WriteLine($"  Exclude URLs: {(config.ExcludeUrls.Count > 0 ? string.Join(", ", config.ExcludeUrls) : "none")}");
+            Console.WriteLine($"  Exclude Login Page: {config.ExcludeLoginPage}");
+            Console.WriteLine($"  Ignore SSL Errors: {config.IgnoreSslErrors}");
             Console.WriteLine();
 
             // Run tests
@@ -223,6 +232,21 @@ class Program
                         config.NavigationTimeout = timeout;
                     break;
 
+                case "--click-timeout":
+                    if (i + 1 < args.Length && int.TryParse(args[++i], out var clickTimeout))
+                        config.ClickTimeout = clickTimeout;
+                    break;
+
+                case "--wait-network-idle":
+                    if (i + 1 < args.Length && bool.TryParse(args[++i], out var waitNetworkIdle))
+                        config.WaitForNetworkIdle = waitNetworkIdle;
+                    break;
+
+                case "--network-idle-timeout":
+                    if (i + 1 < args.Length && int.TryParse(args[++i], out var networkIdleTimeout))
+                        config.NetworkIdleTimeout = networkIdleTimeout;
+                    break;
+
                 case "--screenshot-path":
                     if (i + 1 < args.Length)
                         config.ScreenshotPath = args[++i];
@@ -250,6 +274,23 @@ class Program
                     }
                     break;
 
+                case "--auto-close-modals":
+                    if (i + 1 < args.Length && bool.TryParse(args[++i], out var autoClose))
+                        config.AutoCloseModals = autoClose;
+                    else
+                        config.AutoCloseModals = true; // Default to true if no value provided
+                    break;
+
+                case "--modal-close-selector":
+                    if (i + 1 < args.Length)
+                        config.ModalCloseSelectors.Add(args[++i]);
+                    break;
+
+                case "--modal-dialog-selector":
+                    if (i + 1 < args.Length)
+                        config.ModalDialogSelectors.Add(args[++i]);
+                    break;
+
                 case "--exclude-url":
                     if (i + 1 < args.Length)
                         config.ExcludeUrls.Add(args[++i]);
@@ -260,6 +301,13 @@ class Program
                         config.ExcludeLoginPage = excludeLogin;
                     else
                         config.ExcludeLoginPage = true; // Default to true if no value provided
+                    break;
+
+                case "--ignore-ssl-errors":
+                    if (i + 1 < args.Length && bool.TryParse(args[++i], out var ignoreSsl))
+                        config.IgnoreSslErrors = ignoreSsl;
+                    else
+                        config.IgnoreSslErrors = true; // Default to true if no value provided
                     break;
 
                 case "--help":
@@ -347,12 +395,19 @@ class Program
         Console.WriteLine("  --visible                      Run browser in visible mode (shortcut for --headless false)");
         Console.WriteLine("  --delay <ms>                   Delay between interactions in ms (default: 500)");
         Console.WriteLine("  --timeout <ms>                 Navigation timeout in ms (default: 30000)");
+        Console.WriteLine("  --click-timeout <ms>           Click timeout in ms (default: 10000)");
+        Console.WriteLine("  --wait-network-idle <bool>     Wait for network idle after clicks (default: true)");
+        Console.WriteLine("  --network-idle-timeout <ms>    Network idle timeout in ms (default: 10000)");
         Console.WriteLine("  --screenshot-path <path>       Path to save screenshots (default: ./screenshots)");
         Console.WriteLine("  --results-path <path>          Path to save test results JSON (default: current directory)");
         Console.WriteLine("  --no-screenshots               Disable screenshots on errors");
         Console.WriteLine("  --dialog-handler <action>      How to handle dialogs: accept, dismiss, ignore (default: accept)");
+        Console.WriteLine("  --auto-close-modals [bool]     Automatically close HTML modal dialogs (default: false)");
+        Console.WriteLine("  --modal-dialog-selector <sel>  CSS selector for modal dialog containers (can be used multiple times)");
+        Console.WriteLine("  --modal-close-selector <sel>   CSS selector for modal close buttons (can be used multiple times)");
         Console.WriteLine("  --exclude-url <pattern>        URL pattern to exclude (can be used multiple times)");
         Console.WriteLine("  --exclude-login-page [bool]    Exclude login page from testing (default: true)");
+        Console.WriteLine("  --ignore-ssl-errors [bool]     Ignore SSL certificate errors (default: false)");
         Console.WriteLine("  -h, --help                     Show this help message");
         Console.WriteLine();
         Console.WriteLine("Examples:");

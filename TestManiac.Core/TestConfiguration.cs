@@ -109,6 +109,39 @@ public class TestConfiguration
     public DialogHandlerAction DialogHandler { get; set; } = DialogHandlerAction.Accept;
 
     /// <summary>
+    /// Whether to automatically close HTML modal dialogs (default: false)
+    /// </summary>
+    public bool AutoCloseModals { get; set; } = false;
+
+    /// <summary>
+    /// CSS selectors for modal dialog containers (default: common patterns)
+    /// </summary>
+    public List<string> ModalDialogSelectors { get; set; } = new List<string>
+    {
+        ".modal[style*='display: block']",
+        ".modal.show",
+        ".modal.in",
+        "[role='dialog'][aria-modal='true']",
+        ".modal-dialog:visible",
+        ".popup:visible",
+        ".dialog:visible"
+    };
+
+    /// <summary>
+    /// CSS selectors for modal close buttons (default: common patterns)
+    /// </summary>
+    public List<string> ModalCloseSelectors { get; set; } = new List<string>
+    {
+        "button.close",
+        "[data-dismiss='modal']",
+        ".modal-close",
+        "[aria-label='Close']",
+        "button[class*='close']",
+        ".close-button",
+        ".modal-header button"
+    };
+
+    /// <summary>
     /// List of URL patterns to exclude from testing (supports wildcards)
     /// </summary>
     public List<string> ExcludeUrls { get; set; } = new List<string>
@@ -122,6 +155,12 @@ public class TestConfiguration
     /// Whether to exclude the login page from testing (default: true)
     /// </summary>
     public bool ExcludeLoginPage { get; set; } = true;
+
+    /// <summary>
+    /// Whether to ignore SSL certificate errors (default: false)
+    /// Useful for testing sites with self-signed certificates
+    /// </summary>
+    public bool IgnoreSslErrors { get; set; } = false;
 }
 
 /// <summary>

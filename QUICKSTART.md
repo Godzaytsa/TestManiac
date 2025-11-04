@@ -51,6 +51,37 @@ dotnet run --project TestManiac.CLI -- ^
   --visible
 ```
 
+### Test with SSL certificate errors ignored (self-signed certs)
+
+```bash
+dotnet run --project TestManiac.CLI -- ^
+  --url https://test.yoursite.com ^
+  --ignore-ssl-errors ^
+  --visible
+```
+
+### Test with custom modal handling
+
+```bash
+dotnet run --project TestManiac.CLI -- ^
+  --url https://yoursite.com ^
+  --auto-close-modals ^
+  --modal-dialog-selector ".custom-modal.show" ^
+  --modal-close-selector ".custom-close-btn" ^
+  --visible
+```
+
+### Test with URL exclusions
+
+```bash
+dotnet run --project TestManiac.CLI -- ^
+  --url https://yoursite.com ^
+  --exclude-url "/admin/*" ^
+  --exclude-url "/api/*" ^
+  --exclude-login-page ^
+  --visible
+```
+
 ### Headless mode (no browser window)
 
 ```bash
@@ -75,9 +106,12 @@ dotnet run --project TestManiac.CLI -- mytest.json
 2. **Start small** - Use `--max-pages 5 --max-depth 2` initially
 3. **Organize results** - Use `--results-path ./results` to save files in a dedicated folder
 4. **Handle dialogs** - Use `--dialog-handler accept` to automatically accept alerts/confirms (default)
-5. **Check the results** - Look at the generated `test-results_*.json` file
-6. **Screenshots** - Check the `screenshots/` folder if errors occur
-7. **Get help** - Run `dotnet run --project TestManiac.CLI -- --help`
+5. **Auto-close modals** - Use `--auto-close-modals` to prevent HTML modal dialogs from blocking tests
+6. **SSL issues** - Use `--ignore-ssl-errors` for sites with self-signed or invalid certificates
+7. **Network timing** - Use `--wait-network-idle` (default: true) to wait for API calls before checking errors
+8. **Check the results** - Look at the generated `test-results_*.json` file
+9. **Screenshots** - Check the `screenshots/` folder if errors occur
+10. **Get help** - Run `dotnet run --project TestManiac.CLI -- --help`
 
 ## Finding CSS Selectors for Login
 

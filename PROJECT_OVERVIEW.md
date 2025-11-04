@@ -54,12 +54,14 @@ Holds all configuration parameters:
 - Login credentials and selectors
 - Browser configuration (type, headless mode)
 - Crawling limits (max pages, max depth)
-- Timing settings (timeouts, delays, click timeout)
+- Timing settings (timeouts, delays, click timeout, network idle timeout)
 - Screenshot settings (path, on error)
 - Results output path
 - Network idle detection settings
 - Dialog handler action (accept, dismiss, ignore)
+- Auto-close modal settings (enabled, dialog selectors, close selectors)
 - URL exclusion patterns
+- SSL certificate error handling
 
 ### 2. WebTester Class
 
@@ -255,26 +257,35 @@ It also monitors:
    - Prompt handling
    - Prevents test blocking on dialogs
 
-7. **URL Management**
+7. **HTML Modal Dialog Handling**
+
+   - Auto-close HTML modals (Bootstrap, custom, etc.)
+   - Configurable close button selectors
+   - Prevents blocking on popup dialogs
+   - Continues testing after modal dismissal
+
+8. **URL Management**
 
    - Domain-aware navigation
    - URL exclusion patterns (wildcards supported)
    - Exclude login page option
    - Start URL configuration
 
-8. **Reporting**
+9. **Reporting**
 
    - Real-time console output with detailed element info
    - Detailed JSON reports
    - Success/failure statistics
    - Combined before/after screenshot gallery
 
-9. **Configuration**
-   - Command-line arguments
-   - JSON configuration files
-   - Flexible parameter options
-   - Network idle detection settings
-   - Dialog handler configuration
+10. **Configuration**
+
+- Command-line arguments
+- JSON configuration files
+- Flexible parameter options
+- Network idle detection settings
+- Dialog handler configuration
+- Modal auto-close settings
 
 ### 🔮 Future Enhancements
 

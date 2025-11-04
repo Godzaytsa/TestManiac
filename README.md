@@ -12,6 +12,7 @@
 ✅ **JavaScript Click Fallback** - Automatically retries with JS click when elements are overlapped  
 ✅ **Network Idle Detection** - Waits for background API calls to complete before checking for errors  
 ✅ **Dialog Handler** - Automatically accepts, dismisses, or ignores JavaScript alerts/confirms/prompts  
+✅ **Auto-Close Modals** - Automatically closes HTML modal dialogs to prevent blocking  
 ✅ **Login Support** - Optional login with configurable credentials  
 ✅ **Multiple Browsers** - Supports Chromium, Firefox, and WebKit  
 ✅ **Detailed Reports** - JSON output with comprehensive test results  
@@ -94,10 +95,18 @@ Options:
   --visible                      Run browser in visible mode
   --delay <ms>                   Delay between interactions in ms (default: 500)
   --timeout <ms>                 Navigation timeout in ms (default: 30000)
-  --click-timeout <ms>           Click timeout in ms (default: 5000)
+  --click-timeout <ms>           Click timeout in ms (default: 10000)
+  --wait-network-idle <bool>     Wait for network idle after clicks (default: true)
+  --network-idle-timeout <ms>    Network idle timeout in ms (default: 10000)
   --screenshot-path <path>       Path to save screenshots (default: ./screenshots)
   --results-path <path>          Path to save test results JSON (default: current directory)
   --dialog-handler <action>      How to handle dialogs: accept, dismiss, ignore (default: accept)
+  --auto-close-modals [bool]     Automatically close HTML modal dialogs (default: false)
+  --modal-dialog-selector <sel>  CSS selector for modal dialog containers (can be used multiple times)
+  --modal-close-selector <sel>   CSS selector for modal close buttons (can be used multiple times)
+  --exclude-url <pattern>        URL pattern to exclude (can be used multiple times)
+  --exclude-login-page [bool]    Exclude login page from testing (default: true)
+  --ignore-ssl-errors [bool]     Ignore SSL certificate errors (default: false)
   --no-screenshots               Disable screenshots on errors
   -h, --help                     Show help message
 ```
@@ -173,8 +182,16 @@ Create a JSON file with your test configuration:
   "screenshotPath": "./screenshots",
   "resultsPath": "./test-results",
   "dialogHandler": "Accept",
+  "autoCloseModals": false,
+  "modalDialogSelectors": [".modal.show", "[role='dialog'][aria-modal='true']"],
+  "modalCloseSelectors": [
+    "button.close",
+    "[data-dismiss='modal']",
+    ".modal-close"
+  ],
   "excludeUrls": ["/logout", "/admin/*"],
-  "excludeLoginPage": true
+  "excludeLoginPage": true,
+  "ignoreSslErrors": false
 }
 ```
 
