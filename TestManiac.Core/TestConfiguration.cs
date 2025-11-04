@@ -67,6 +67,22 @@ public class TestConfiguration
     public int InteractionDelay { get; set; } = 500;
 
     /// <summary>
+    /// Timeout for click interactions in milliseconds (default: 5000)
+    /// </summary>
+    public int ClickTimeout { get; set; } = 5000;
+
+    /// <summary>
+    /// Whether to wait for network idle after clicks (default: true)
+    /// Waits until there are no more than 2 network connections for at least 500ms
+    /// </summary>
+    public bool WaitForNetworkIdle { get; set; } = true;
+
+    /// <summary>
+    /// Timeout for waiting for network idle in milliseconds (default: 10000)
+    /// </summary>
+    public int NetworkIdleTimeout { get; set; } = 10000;
+
+    /// <summary>
     /// Whether to take screenshots on errors (default: true)
     /// </summary>
     public bool ScreenshotOnError { get; set; } = true;

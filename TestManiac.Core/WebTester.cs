@@ -1,4 +1,5 @@
 using Microsoft.Playwright;
+using SkiaSharp;
 
 namespace TestManiac.Core;
 
@@ -212,6 +213,10 @@ public class WebTester : IAsyncDisposable
             // Interact with each element
             for (int i = 0; i < interactableElements.Count; i++)
             {
+                IElementHandle? element = null;
+                string? beforeScreenshotPath = null; // Declare here so it's accessible in catch block
+                string description = "Unknown element"; // Default description in case element info retrieval fails
+
                 try
                 {
                     // Re-fetch elements each time to avoid stale element references
@@ -224,10 +229,10 @@ public class WebTester : IAsyncDisposable
                         break;
                     }
 
-                    var element = currentElements[i];
+                    element = currentElements[i];
 
                     // Get element info before interaction (wrapped in try-catch for stale elements)
-                    string tagName, elementText, description;
+                    string tagName, elementText;
                     string? href = null;
 
                     try
@@ -235,7 +240,22 @@ public class WebTester : IAsyncDisposable
                         tagName = await element.EvaluateAsync<string>("el => el.tagName");
                         elementText = await element.TextContentAsync() ?? "";
                         href = await element.GetAttributeAsync("href");
-                        description = $"{tagName} - '{elementText.Trim().Substring(0, Math.Min(50, elementText.Trim().Length))}'";
+
+                        // If element has no text, use outerHTML for better identification
+                        if (string.IsNullOrWhiteSpace(elementText))
+                        {
+                            string outerHtml = await element.EvaluateAsync<string>("el => el.outerHTML");
+                            // Truncate long HTML to keep logs readable
+                            if (outerHtml.Length > 150)
+                            {
+                                outerHtml = outerHtml.Substring(0, 147) + "...";
+                            }
+                            description = $"{tagName} - HTML: {outerHtml}";
+                        }
+                        else
+                        {
+                            description = $"{tagName} - '{elementText.Trim().Substring(0, Math.Min(50, elementText.Trim().Length))}'";
+                        }
                     }
                     catch (Exception)
                     {
@@ -258,13 +278,22 @@ public class WebTester : IAsyncDisposable
                         }
                     }
 
+                    // Take "before" screenshot with element highlighted
+                    if (_config.ScreenshotOnError)
+                    {
+                        beforeScreenshotPath = await TakeScreenshotAsync($"before_{_screenshotCounter}", element);
+                    }
+
                     // Perform the click
                     var currentUrl = _page.Url;
 
                     try
                     {
-                        await element.ClickAsync(new() { Timeout = 5000 });
+                        await element.ClickAsync(new() { Timeout = _config.ClickTimeout });
                         await Task.Delay(_config.InteractionDelay);
+
+                        // Wait for network to become idle after click
+                        await WaitForNetworkIdleAsync();
                     }
                     catch (Exception clickEx)
                     {
@@ -275,7 +304,33 @@ public class WebTester : IAsyncDisposable
                             Log($"    ⚠ Element detached during click, skipping...");
                             continue;
                         }
-                        throw; // Re-throw other exceptions
+
+                        // If click failed due to element being overlapped/intercepted, try JavaScript click
+                        if (clickEx.Message.Contains("intercepts pointer events") ||
+                            clickEx.Message.Contains("not clickable") ||
+                            clickEx.Message.Contains("Other element would receive the click"))
+                        {
+                            Log($"    ⚠ Element overlapped, trying JavaScript click...");
+                            try
+                            {
+                                await element.EvaluateAsync("el => el.click()");
+                                await Task.Delay(_config.InteractionDelay);
+
+                                // Wait for network to become idle after JavaScript click
+                                await WaitForNetworkIdleAsync();
+
+                                Log($"    ✓ JavaScript click succeeded");
+                            }
+                            catch (Exception jsEx)
+                            {
+                                Log($"    ⚠ JavaScript click also failed: {jsEx.Message}");
+                                throw; // Re-throw to be caught by outer exception handler
+                            }
+                        }
+                        else
+                        {
+                            throw; // Re-throw other exceptions
+                        }
                     }
 
                     // Check for errors after interaction
@@ -292,12 +347,45 @@ public class WebTester : IAsyncDisposable
 
                     if (hasError)
                     {
-                        result.ScreenshotPath = await TakeScreenshotAsync($"error_{_screenshotCounter++}");
+                        // Take "after" screenshot
+                        string? afterScreenshotPath = await TakeScreenshotAsync($"after_{_screenshotCounter}", null);
+
+                        // Combine before and after screenshots
+                        if (beforeScreenshotPath != null && afterScreenshotPath != null)
+                        {
+                            result.ScreenshotPath = CombineScreenshots(beforeScreenshotPath, afterScreenshotPath, $"error_{_screenshotCounter}");
+
+                            // Delete temporary screenshots
+                            try
+                            {
+                                File.Delete(beforeScreenshotPath);
+                                File.Delete(afterScreenshotPath);
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            result.ScreenshotPath = afterScreenshotPath ?? beforeScreenshotPath;
+                        }
+
+                        _screenshotCounter++;
                         _summary.FailedInteractions++;
-                        Log($"    ❌ Error detected!");
+                        Log($"   ❌ Failed: {description}");
+                        Log($"      Error: Error detected on page after interaction");
+                        Log($"      URL: {url}");
                     }
                     else
                     {
+                        // Delete "before" screenshot if no error occurred
+                        if (beforeScreenshotPath != null)
+                        {
+                            try
+                            {
+                                File.Delete(beforeScreenshotPath);
+                            }
+                            catch { }
+                        }
+
                         _summary.SuccessfulInteractions++;
                         Log($"    ✓ Success");
                     }
@@ -320,21 +408,54 @@ public class WebTester : IAsyncDisposable
                 {
                     Log($"    ⚠ Exception during interaction: {ex.Message}");
 
+                    try
+                    {
+                        var currentElements = await GetInteractableElementsAsync();
+                        if (i < currentElements.Count)
+                        {
+                            element = currentElements[i];
+                        }
+                    }
+                    catch { }
+
+                    // Take "after" screenshot on exception
+                    string? afterScreenshotPath = await TakeScreenshotAsync($"after_{_screenshotCounter}", element);
+                    string? finalScreenshotPath = afterScreenshotPath;
+
+                    // Combine before and after screenshots if both exist
+                    if (beforeScreenshotPath != null && afterScreenshotPath != null)
+                    {
+                        finalScreenshotPath = CombineScreenshots(beforeScreenshotPath, afterScreenshotPath, $"error_{_screenshotCounter}");
+
+                        // Delete temporary screenshots
+                        try
+                        {
+                            File.Delete(beforeScreenshotPath);
+                            File.Delete(afterScreenshotPath);
+                        }
+                        catch { }
+                    }
+
                     var result = new TestResult
                     {
                         Url = url,
-                        ElementDescription = "Unknown element",
+                        ElementDescription = description,
                         Success = false,
                         ErrorMessage = ex.Message,
                         ErrorType = ex.GetType().Name,
                         Timestamp = DateTime.Now,
-                        ScreenshotPath = await TakeScreenshotAsync($"exception_{_screenshotCounter++}")
+                        ScreenshotPath = finalScreenshotPath
                     };
 
+                    _screenshotCounter++;
                     _summary.TotalInteractions++;
                     _summary.FailedInteractions++;
                     _summary.Results.Add(result);
                     InteractionCompleted?.Invoke(this, result);
+
+                    Log($"   ❌ Failed: {description}");
+                    Log($"      Error: {ex.Message}");
+                    Log($"      URL: {url}");
 
                     // Try to recover
                     try
@@ -494,6 +615,178 @@ public class WebTester : IAsyncDisposable
         {
             Log($"Failed to take screenshot: {ex.Message}");
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Take a screenshot with an element highlighted
+    /// </summary>
+    private async Task<string?> TakeScreenshotAsync(string fileName, IElementHandle? element)
+    {
+        if (!_config.ScreenshotOnError || _page == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            // Highlight the element if provided
+            if (element != null)
+            {
+                try
+                {
+                    // Add red border around the element
+                    await element.EvaluateAsync(@"
+                        element => {
+                            element.style.outline = '3px solid red';
+                            element.style.outlineOffset = '2px';
+                            element.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+                            element.scrollIntoView({ behavior: 'instant', block: 'center' });
+                        }
+                    ");
+
+                    // Wait a moment for the highlight to render
+                    await Task.Delay(200);
+                }
+                catch
+                {
+                    // Element might be detached, continue anyway
+                }
+            }
+
+            var path = Path.Combine(_config.ScreenshotPath, $"{fileName}_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+            await _page.ScreenshotAsync(new() { Path = path, FullPage = true });
+
+            // Remove highlight if element was highlighted
+            if (element != null)
+            {
+                try
+                {
+                    await element.EvaluateAsync(@"
+                        element => {
+                            element.style.outline = '';
+                            element.style.outlineOffset = '';
+                            element.style.backgroundColor = '';
+                        }
+                    ");
+                }
+                catch
+                {
+                    // Element might be detached, ignore
+                }
+            }
+
+            return path;
+        }
+        catch (Exception ex)
+        {
+            Log($"Failed to take screenshot: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Combine two screenshots side-by-side into one image
+    /// </summary>
+    private string? CombineScreenshots(string beforePath, string afterPath, string outputFileName)
+    {
+        try
+        {
+            using var beforeBitmap = SKBitmap.Decode(beforePath);
+            using var afterBitmap = SKBitmap.Decode(afterPath);
+
+            if (beforeBitmap == null || afterBitmap == null)
+            {
+                Log("Failed to decode one or both screenshots for combining");
+                return null;
+            }
+
+            // Calculate dimensions for combined image
+            int maxHeight = Math.Max(beforeBitmap.Height, afterBitmap.Height);
+            int totalWidth = beforeBitmap.Width + afterBitmap.Width + 40; // 40px for spacing and labels
+            int labelHeight = 40;
+            int combinedHeight = maxHeight + labelHeight;
+
+            // Create combined bitmap
+            var combinedInfo = new SKImageInfo(totalWidth, combinedHeight);
+            using var combinedBitmap = new SKBitmap(combinedInfo);
+            using var canvas = new SKCanvas(combinedBitmap);
+
+            // Fill with white background
+            canvas.Clear(SKColors.White);
+
+            // Draw "BEFORE" label
+            using (var paint = new SKPaint { Color = SKColors.Black, IsAntialias = true })
+            using (var font = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold), 24))
+            {
+                string beforeText = "BEFORE (Element to click)";
+                float beforeTextX = (beforeBitmap.Width - font.MeasureText(beforeText)) / 2;
+                canvas.DrawText(beforeText, beforeTextX, 28, font, paint);
+            }
+
+            // Draw "AFTER" label
+            using (var paint = new SKPaint { Color = SKColors.Red, IsAntialias = true })
+            using (var font = new SKFont(SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold), 24))
+            {
+                string afterText = "AFTER (Error occurred)";
+                float afterTextX = beforeBitmap.Width + 20 + (afterBitmap.Width - font.MeasureText(afterText)) / 2;
+                canvas.DrawText(afterText, afterTextX, 28, font, paint);
+            }
+
+            // Draw before screenshot
+            canvas.DrawBitmap(beforeBitmap, 0, labelHeight);
+
+            // Draw vertical separator line
+            using (var paint = new SKPaint())
+            {
+                paint.Color = SKColors.Gray;
+                paint.StrokeWidth = 2;
+                paint.Style = SKPaintStyle.Stroke;
+                canvas.DrawLine(beforeBitmap.Width + 10, labelHeight, beforeBitmap.Width + 10, labelHeight + maxHeight, paint);
+            }
+
+            // Draw after screenshot
+            canvas.DrawBitmap(afterBitmap, beforeBitmap.Width + 20, labelHeight);
+
+            // Save combined image
+            var outputPath = Path.Combine(_config.ScreenshotPath, $"{outputFileName}_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+            using (var image = SKImage.FromBitmap(combinedBitmap))
+            using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+            using (var stream = File.OpenWrite(outputPath))
+            {
+                data.SaveTo(stream);
+            }
+
+            Log($"    Combined screenshot saved: {Path.GetFileName(outputPath)}");
+            return outputPath;
+        }
+        catch (Exception ex)
+        {
+            Log($"Failed to combine screenshots: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Wait for network to become idle (no more than 2 connections for 500ms)
+    /// </summary>
+    private async Task WaitForNetworkIdleAsync()
+    {
+        if (!_config.WaitForNetworkIdle || _page == null)
+            return;
+
+        try
+        {
+            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle, new() { Timeout = _config.NetworkIdleTimeout });
+        }
+        catch (TimeoutException)
+        {
+            // Network didn't become idle within timeout, continue anyway
+            Log($"    ⚠ Network idle timeout exceeded, continuing...");
+        }
+        catch (Exception ex)
+        {
+            Log($"    ⚠ Error waiting for network idle: {ex.Message}");
         }
     }
 
