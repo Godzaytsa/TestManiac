@@ -5,11 +5,10 @@ REM Usage: run-test.bat [config-file.json] OR run-test.bat --url <url> [options]
 if not "%~1"=="" goto :run_tests
 
 REM No arguments provided, show help
-REM No arguments provided, show help
-echo ╔══════════════════════════════════════╗
-echo ║         TestManiac v1.0              ║
-echo ║  Automated Web Testing Tool          ║
-echo ╚══════════════════════════════════════╝
+echo ========================================
+echo          TestManiac v1.0
+echo     Automated Web Testing Tool
+echo ========================================
 echo.
 echo Error: Please provide a config file or URL
 echo.
@@ -34,7 +33,7 @@ echo   --max-pages ^<number^>         Maximum pages to crawl (default: 50)
 echo   --max-depth ^<number^>         Maximum navigation depth (default: 5)
 echo   --browser ^<type^>             Browser: chromium, firefox, webkit
 echo   --visible                    Run browser in visible mode
-echo   --headless ^<true^|false^>     Run in headless mode
+echo   --headless ^<true^|false^>      Run in headless mode
 echo   --delay ^<ms^>                 Delay between interactions
 echo   --timeout ^<ms^>               Navigation timeout
 echo   --click-timeout ^<ms^>         Click timeout
@@ -42,17 +41,10 @@ echo   --screenshot-path ^<path^>     Screenshots folder
 echo   --results-path ^<path^>        Results JSON folder
 echo   --no-screenshots             Disable screenshots
 echo.
-pause
 exit /b 1
 
 :run_tests
 REM Arguments provided, run tests
-
-echo ╔══════════════════════════════════════╗
-echo ║         TestManiac v1.0              ║
-echo ║  Automated Web Testing Tool          ║
-echo ╚══════════════════════════════════════╝
-echo.
 
 REM Check if first argument is a config file (ends with .json)
 set "FIRST_ARG=%~1"
@@ -68,10 +60,8 @@ dotnet run --project TestManiac.CLI -- %*
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo ✓ Test completed successfully
+    echo [SUCCESS] Test completed successfully
 ) else (
     echo.
-    echo ✗ Test completed with errors - check the results file
+    echo [ERROR] Test completed with errors - check the results file
 )
-
-pause

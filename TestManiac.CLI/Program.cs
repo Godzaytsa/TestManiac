@@ -31,16 +31,22 @@ class Program
 
             // Display configuration
             Console.WriteLine("Configuration:");
-            Console.WriteLine($"  Base URL: {config.BaseUrl}");
-            if (!string.IsNullOrEmpty(config.StartUrl))
-            {
-                Console.WriteLine($"  Start URL: {config.StartUrl}");
-            }
             Console.WriteLine($"  Browser: {config.BrowserType}");
             Console.WriteLine($"  Headless: {config.Headless}");
+            Console.WriteLine($"  Base URL: {config.BaseUrl}");
+            Console.WriteLine($"  Start URL: {config.StartUrl ?? string.Empty}");
+            Console.WriteLine($"  Username: {config.Username ?? string.Empty}");
+            Console.WriteLine($"  Password: {(string.IsNullOrEmpty(config.Password) ? string.Empty : "********")}");
             Console.WriteLine($"  Max Pages: {config.MaxPagesToCrawl}");
             Console.WriteLine($"  Max Depth: {config.MaxDepth}");
-            Console.WriteLine($"  Login: {(!string.IsNullOrEmpty(config.Username) ? "Yes" : "No")}");
+            Console.WriteLine($"  Interaction Delay: {config.InteractionDelay}ms");
+            Console.WriteLine($"  Navigation Timeout: {config.NavigationTimeout}ms");
+            Console.WriteLine($"  Click Timeout: {config.ClickTimeout}ms");
+            Console.WriteLine($"  Wait for Network Idle: {config.WaitForNetworkIdle}");
+            Console.WriteLine($"  Network Idle Timeout: {config.NetworkIdleTimeout}ms");
+            Console.WriteLine($"  Screenshot on Error: {config.ScreenshotOnError}");
+            Console.WriteLine($"  Screenshot Path: {config.ScreenshotPath ?? string.Empty}");
+            Console.WriteLine($"  Results Path: {config.ResultsPath ?? string.Empty}");
             Console.WriteLine();
 
             // Run tests

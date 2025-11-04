@@ -1,5 +1,5 @@
 {
-  "baseUrl": "https://example.com",
+  "baseUrl": "",
   "startUrl": null,
   "username": null,
   "password": null,
@@ -9,15 +9,15 @@
   "maxPagesToCrawl": 50,
   "maxDepth": 5,
   "navigationTimeout": 30000,
-  "headless": true,
+  "headless": false,
   "browserType": "Chromium",
   "interactionDelay": 500,
-  "clickTimeout": 5000,
+  "clickTimeout": 10000,
   "waitForNetworkIdle": true,
   "networkIdleTimeout": 10000,
   "screenshotOnError": true,
-  "screenshotPath": "./screenshots",
-  "resultsPath": null,
+  "screenshotPath": "./results/screenshots",
+  "resultsPath": "./results",
   "excludeUrls": [],
   "excludeLoginPage": true
 }

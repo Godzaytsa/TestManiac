@@ -58,7 +58,7 @@ public class TestConfiguration
     public int NavigationTimeout { get; set; } = 30000;
 
     /// <summary>
-    /// Whether to run browser in headless mode (default: true)
+    /// Whether to run browser in headless mode (default: false)
     /// </summary>
     public bool Headless { get; set; } = false;
 
@@ -73,7 +73,7 @@ public class TestConfiguration
     public int InteractionDelay { get; set; } = 500;
 
     /// <summary>
-    /// Timeout for click interactions in milliseconds (default: 5000)
+    /// Timeout for click interactions in milliseconds (default: 10000)
     /// </summary>
     public int ClickTimeout { get; set; } = 10000;
 
@@ -94,14 +94,14 @@ public class TestConfiguration
     public bool ScreenshotOnError { get; set; } = true;
 
     /// <summary>
-    /// Path to save screenshots (default: ./screenshots)
+    /// Path to save screenshots (default: ./results/screenshots)
     /// </summary>
-    public string ScreenshotPath { get; set; } = "./screenshots";
+    public string ScreenshotPath { get; set; } = "./results/screenshots";
 
     /// <summary>
-    /// Path to save test results JSON files (default: current directory)
+    /// Path to save test results JSON files (default: ./results)
     /// </summary>
-    public string? ResultsPath { get; set; }
+    public string? ResultsPath { get; set; } = "./results";
 
     /// <summary>
     /// List of URL patterns to exclude from testing (supports wildcards)
