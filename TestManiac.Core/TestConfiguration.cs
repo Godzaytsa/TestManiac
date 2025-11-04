@@ -143,12 +143,12 @@ public enum DialogHandlerAction
     /// Automatically accept/OK all dialogs
     /// </summary>
     Accept,
-    
+
     /// <summary>
     /// Automatically dismiss/Cancel all dialogs
     /// </summary>
     Dismiss,
-    
+
     /// <summary>
     /// Do not handle dialogs automatically (may block test execution)
     /// </summary>

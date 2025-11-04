@@ -64,19 +64,19 @@ public class WebTester : IAsyncDisposable
         _page.Dialog += async (_, dialog) =>
         {
             Log($"Dialog detected - Type: {dialog.Type}, Message: {dialog.Message}");
-            
+
             switch (_config.DialogHandler)
             {
                 case DialogHandlerAction.Accept:
                     Log("Accepting dialog...");
                     await dialog.AcceptAsync();
                     break;
-                    
+
                 case DialogHandlerAction.Dismiss:
                     Log("Dismissing dialog...");
                     await dialog.DismissAsync();
                     break;
-                    
+
                 case DialogHandlerAction.Ignore:
                     Log("Ignoring dialog (may block execution)");
                     break;
