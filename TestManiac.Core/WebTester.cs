@@ -106,8 +106,17 @@ public class WebTester : IAsyncDisposable
                 Log("No login credentials provided, skipping login step.");
             }
 
-            // Start crawling from the base page
-            await CrawlPageAsync(_page.Url, 0);
+            // Navigate to start URL if specified, otherwise use current page URL
+            string startUrl = !string.IsNullOrEmpty(_config.StartUrl) ? _config.StartUrl : _page.Url;
+
+            if (!string.IsNullOrEmpty(_config.StartUrl) && _config.StartUrl != _page.Url)
+            {
+                Log($"Navigating to start URL: {_config.StartUrl}");
+                await _page.GotoAsync(_config.StartUrl, new() { WaitUntil = WaitUntilState.NetworkIdle });
+            }
+
+            // Start crawling from the start page
+            await CrawlPageAsync(startUrl, 0);
 
             _summary.EndTime = DateTime.Now;
             Log($"\n=== Test Summary ===");

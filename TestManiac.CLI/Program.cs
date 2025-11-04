@@ -32,6 +32,10 @@ class Program
             // Display configuration
             Console.WriteLine("Configuration:");
             Console.WriteLine($"  Base URL: {config.BaseUrl}");
+            if (!string.IsNullOrEmpty(config.StartUrl))
+            {
+                Console.WriteLine($"  Start URL: {config.StartUrl}");
+            }
             Console.WriteLine($"  Browser: {config.BrowserType}");
             Console.WriteLine($"  Headless: {config.Headless}");
             Console.WriteLine($"  Max Pages: {config.MaxPagesToCrawl}");
@@ -128,6 +132,12 @@ class Program
                 case "-u":
                     if (i + 1 < args.Length)
                         config.BaseUrl = args[++i];
+                    break;
+
+                case "--start-url":
+                case "-s":
+                    if (i + 1 < args.Length)
+                        config.StartUrl = args[++i];
                     break;
 
                 case "--username":
@@ -289,6 +299,7 @@ class Program
         Console.WriteLine();
         Console.WriteLine("Options:");
         Console.WriteLine("  -u, --url <url>                Base URL to test (required)");
+        Console.WriteLine("  -s, --start-url <url>          Start testing from this URL (optional)");
         Console.WriteLine("  --username <username>          Login username (optional)");
         Console.WriteLine("  --password <password>          Login password (optional)");
         Console.WriteLine("  --username-selector <selector> CSS selector for username field");

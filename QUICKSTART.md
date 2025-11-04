@@ -37,11 +37,12 @@ dotnet run --project TestManiac.CLI -- --url https://example.com --visible
 dotnet run --project TestManiac.CLI -- --url https://yoursite.com --max-pages 10 --max-depth 2
 ```
 
-### Test with login
+### Test with login and start from specific page
 
 ```bash
 dotnet run --project TestManiac.CLI -- ^
   --url https://yoursite.com ^
+  --start-url https://yoursite.com/dashboard ^
   --username your-username ^
   --password your-password ^
   --username-selector "#username" ^
@@ -106,7 +107,7 @@ The tool will:
 ## Output Files
 
 - `test-results_TIMESTAMP.json` - Detailed results
-- `screenshots/error_*.png` - Screenshots of errors
+- `screenshots/error_*.png` - Combined before/after screenshots of errors (side-by-side comparison)
 - Console output - Real-time progress
 
 ## Need Help?

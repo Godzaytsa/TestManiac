@@ -11,6 +11,12 @@ public class TestConfiguration
     public string BaseUrl { get; set; } = string.Empty;
 
     /// <summary>
+    /// The URL of the page to start testing from (optional)
+    /// If not specified, testing starts from BaseUrl
+    /// </summary>
+    public string? StartUrl { get; set; }
+
+    /// <summary>
     /// Username for login (optional)
     /// </summary>
     public string? Username { get; set; }
@@ -69,7 +75,7 @@ public class TestConfiguration
     /// <summary>
     /// Timeout for click interactions in milliseconds (default: 5000)
     /// </summary>
-    public int ClickTimeout { get; set; } = 5000;
+    public int ClickTimeout { get; set; } = 10000;
 
     /// <summary>
     /// Whether to wait for network idle after clicks (default: true)

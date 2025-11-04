@@ -1,5 +1,6 @@
 {
   "baseUrl": "https://example.com",
+  "startUrl": null,
   "username": null,
   "password": null,
   "usernameSelector": null,
@@ -11,6 +12,9 @@
   "headless": true,
   "browserType": "Chromium",
   "interactionDelay": 500,
+  "clickTimeout": 5000,
+  "waitForNetworkIdle": true,
+  "networkIdleTimeout": 10000,
   "screenshotOnError": true,
   "screenshotPath": "./screenshots",
   "excludeUrls": [],

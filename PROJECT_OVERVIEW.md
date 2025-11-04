@@ -50,12 +50,14 @@ TestManiac/
 
 Holds all configuration parameters:
 
-- URL and domain settings
+- URL and domain settings (baseUrl, startUrl)
 - Login credentials and selectors
 - Browser configuration (type, headless mode)
 - Crawling limits (max pages, max depth)
-- Timing settings (timeouts, delays)
+- Timing settings (timeouts, delays, click timeout)
 - Screenshot settings
+- Network idle detection settings
+- URL exclusion patterns
 
 ### 2. WebTester Class
 
@@ -63,13 +65,16 @@ The main testing engine that:
 
 - Initializes Playwright and browser
 - Handles login flow
+- Navigates to start URL (if specified)
 - Crawls pages recursively
 - Identifies interactive elements
-- Performs interactions safely
+- Performs interactions safely (with JavaScript fallback)
+- Waits for network idle after clicks
 - Detects errors on pages
-- Captures screenshots
+- Captures before/after combined screenshots
 - Tracks visited URLs to avoid duplicates
 - Navigates back after following links
+- Handles URL exclusion patterns
 
 **Key Methods:**
 
@@ -79,6 +84,10 @@ The main testing engine that:
 - `CrawlPageAsync()` - Recursive page crawler
 - `GetInteractableElementsAsync()` - Finds clickable elements
 - `CheckForErrorsAsync()` - Error detection
+- `TakeScreenshotAsync()` - Captures screenshots with element highlighting
+- `CombineScreenshots()` - Creates before/after comparison images
+- `WaitForNetworkIdleAsync()` - Waits for background requests to complete
+- `ShouldExcludeUrl()` - Checks URL exclusion patterns
 
 **Events:**
 
@@ -119,26 +128,31 @@ Command-line interface that:
    ↓
 4. Perform Login (if configured)
    ↓
-5. Start Crawling Current Page
+5. Navigate to Start URL (if specified)
+   ↓
+6. Start Crawling Current Page
    │
    ├─→ Find All Interactive Elements
    │   │
-   │   ├─→ Click Element
+   │   ├─→ Take "Before" Screenshot (element highlighted)
+   │   ├─→ Click Element (with JS fallback if overlapped)
+   │   ├─→ Wait for Network Idle
    │   ├─→ Check for Errors
-   │   ├─→ Take Screenshot (if error)
+   │   ├─→ Take "After" Screenshot (if error)
+   │   ├─→ Combine Screenshots (if error)
    │   ├─→ Navigate Back (if page changed)
    │   └─→ Repeat for next element
    │
-   ├─→ Collect Links to Same Domain
+   ├─→ Collect Links to Same Domain (excluding patterns)
    │
    └─→ Recursively Crawl Each Link
        (respecting max depth & max pages)
    ↓
-6. Generate Summary Report
+7. Generate Summary Report
    ↓
-7. Save Results to JSON
+8. Save Results to JSON
    ↓
-8. Display Statistics & Exit
+9. Display Statistics & Exit
 ```
 
 ### Element Interaction Logic
@@ -154,12 +168,17 @@ Command-line interface that:
 
 // For each element:
 1. Verify it's visible and enabled
-2. Get element description (tag, text)
-3. Click element with timeout
-4. Wait for interaction delay
-5. Check for error indicators
-6. If page navigated, go back
-7. Record result
+2. Get element description (tag, text, or outerHTML if no text)
+3. Take "before" screenshot with element highlighted
+4. Try to click element with timeout
+   - If overlapped, automatically retry with JavaScript click
+5. Wait for network idle (background API calls)
+6. Check for error indicators
+7. If error found:
+   - Take "after" screenshot
+   - Combine before/after into side-by-side image
+8. If page navigated, go back
+9. Record result with element description and URL
 ```
 
 ### Error Detection
@@ -223,19 +242,28 @@ It also monitors:
    - Multiple error pattern matching
    - Console error monitoring
    - Page error tracking
-   - Screenshot capture on errors
+   - Before/after combined screenshot capture
+   - Element highlighting in screenshots
+
+6. **URL Management**
+
+   - Domain-aware navigation
+   - URL exclusion patterns (wildcards supported)
+   - Exclude login page option
+   - Start URL configuration
 
 6. **Reporting**
 
-   - Real-time console output
+   - Real-time console output with detailed element info
    - Detailed JSON reports
    - Success/failure statistics
-   - Screenshot gallery
+   - Combined before/after screenshot gallery
 
 7. **Configuration**
    - Command-line arguments
    - JSON configuration files
    - Flexible parameter options
+   - Network idle detection settings
 
 ### 🔮 Future Enhancements
 

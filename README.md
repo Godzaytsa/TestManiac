@@ -8,11 +8,14 @@
 ✅ **Domain-Aware Crawling** - Stays within your domain while navigating through pages  
 ✅ **Smart Navigation** - Automatically returns to previous pages after following links  
 ✅ **Error Detection** - Identifies and reports errors after each interaction  
-✅ **Screenshot Capture** - Takes screenshots when errors are detected  
+✅ **Before/After Screenshots** - Captures combined screenshots showing element before click and page after error  
+✅ **JavaScript Click Fallback** - Automatically retries with JS click when elements are overlapped  
+✅ **Network Idle Detection** - Waits for background API calls to complete before checking for errors  
 ✅ **Login Support** - Optional login with configurable credentials  
 ✅ **Multiple Browsers** - Supports Chromium, Firefox, and WebKit  
 ✅ **Detailed Reports** - JSON output with comprehensive test results  
 ✅ **Flexible Configuration** - Command-line arguments or JSON config files  
+✅ **URL Exclusion** - Skip specific pages or patterns from testing  
 ✅ **Reusable Library** - Use the core library in your own projects
 
 ## Installation
@@ -77,6 +80,7 @@ TestManiac.CLI <config-file.json>
 
 Options:
   -u, --url <url>                Base URL to test (required)
+  -s, --start-url <url>          Start testing from this URL (optional)
   --username <username>          Login username (optional)
   --password <password>          Login password (optional)
   --username-selector <selector> CSS selector for username field
@@ -89,6 +93,7 @@ Options:
   --visible                      Run browser in visible mode
   --delay <ms>                   Delay between interactions in ms (default: 500)
   --timeout <ms>                 Navigation timeout in ms (default: 30000)
+  --click-timeout <ms>           Click timeout in ms (default: 5000)
   --screenshot-path <path>       Path to save screenshots (default: ./screenshots)
   --no-screenshots               Disable screenshots on errors
   -h, --help                     Show help message
@@ -143,6 +148,7 @@ Create a JSON file with your test configuration:
 ```json
 {
   "baseUrl": "https://example.com",
+  "startUrl": "https://example.com/dashboard",
   "username": "admin",
   "password": "secret123",
   "usernameSelector": "#username",
@@ -154,8 +160,13 @@ Create a JSON file with your test configuration:
   "headless": true,
   "browserType": "Chromium",
   "interactionDelay": 500,
+  "clickTimeout": 5000,
+  "waitForNetworkIdle": true,
+  "networkIdleTimeout": 10000,
   "screenshotOnError": true,
-  "screenshotPath": "./screenshots"
+  "screenshotPath": "./screenshots",
+  "excludeUrls": ["/logout", "/admin/*"],
+  "excludeLoginPage": true
 }
 ```
 
@@ -211,14 +222,17 @@ Console.WriteLine($"Success Rate: {summary.SuccessRate:F2}%");
 
 1. **Initialization**: Launches the specified browser and navigates to the base URL
 2. **Login** (Optional): If credentials are provided, performs login
-3. **Crawling**: Starting from the base page:
+3. **Navigation**: If startUrl is specified, navigates to that page to begin testing
+4. **Crawling**: Starting from the start page (or base page):
    - Identifies all visible and enabled interactive elements (buttons, links, etc.)
-   - Clicks each element one by one
+   - Takes a "before" screenshot with the element highlighted
+   - Clicks each element one by one (with JavaScript fallback if element is overlapped)
+   - Waits for network to become idle (all API calls complete)
    - Checks for errors after each interaction
-   - Takes screenshots if errors are detected
+   - If error detected, takes "after" screenshot and combines both into side-by-side comparison
    - If a link leads to a new page within the same domain, crawls that page recursively
    - Returns to the previous page after exploring links
-4. **Reporting**: Generates a comprehensive JSON report with all interactions and results
+5. **Reporting**: Generates a comprehensive JSON report with all interactions and results
 
 ## Output
 
@@ -246,7 +260,12 @@ A detailed JSON file (`test-results_TIMESTAMP.json`) containing:
 
 ### Screenshots
 
-If enabled, screenshots are saved to the specified directory when errors occur.
+When errors occur, the tool captures:
+- **Before screenshot**: Shows the page with the clicked element highlighted in red
+- **After screenshot**: Shows the page state after the error occurred
+- **Combined screenshot**: Both images side-by-side with "BEFORE" and "AFTER" labels
+
+Screenshots are saved to the specified directory with descriptive filenames.
 
 ## Best Practices
 

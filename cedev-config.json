@@ -1,5 +1,6 @@
 {
   "baseUrl": "",
+  "startUrl": null,
   "username": "",
   "password": "",
   "usernameSelector": null,
@@ -11,6 +12,9 @@
   "headless": false,
   "browserType": "chromium",
   "interactionDelay": 500,
+  "clickTimeout": 5000,
+  "waitForNetworkIdle": true,
+  "networkIdleTimeout": 10000,
   "screenshotOnError": true,
   "screenshotPath": "./screenshots",
   "excludeUrls": [
