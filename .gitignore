@@ -61,3 +61,6 @@ Thumbs.db
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Example files (not part of build)
+Examples/
