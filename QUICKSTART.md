@@ -74,9 +74,10 @@ dotnet run --project TestManiac.CLI -- mytest.json
 1. **Always start with `--visible`** so you can see what's happening
 2. **Start small** - Use `--max-pages 5 --max-depth 2` initially
 3. **Organize results** - Use `--results-path ./results` to save files in a dedicated folder
-4. **Check the results** - Look at the generated `test-results_*.json` file
-5. **Screenshots** - Check the `screenshots/` folder if errors occur
-6. **Get help** - Run `dotnet run --project TestManiac.CLI -- --help`
+4. **Handle dialogs** - Use `--dialog-handler accept` to automatically accept alerts/confirms (default)
+5. **Check the results** - Look at the generated `test-results_*.json` file
+6. **Screenshots** - Check the `screenshots/` folder if errors occur
+7. **Get help** - Run `dotnet run --project TestManiac.CLI -- --help`
 
 ## Finding CSS Selectors for Login
 

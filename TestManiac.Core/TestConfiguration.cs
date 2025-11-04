@@ -104,9 +104,19 @@ public class TestConfiguration
     public string? ResultsPath { get; set; } = "./results";
 
     /// <summary>
+    /// How to handle JavaScript dialog boxes (alert, confirm, prompt)
+    /// </summary>
+    public DialogHandlerAction DialogHandler { get; set; } = DialogHandlerAction.Accept;
+
+    /// <summary>
     /// List of URL patterns to exclude from testing (supports wildcards)
     /// </summary>
-    public List<string> ExcludeUrls { get; set; } = new();
+    public List<string> ExcludeUrls { get; set; } = new List<string>
+    {
+        "/login",
+        "/logout",
+        "/signout"
+    };
 
     /// <summary>
     /// Whether to exclude the login page from testing (default: true)
@@ -122,4 +132,25 @@ public enum BrowserType
     Chromium,
     Firefox,
     WebKit
+}
+
+/// <summary>
+/// Dialog handler action for JavaScript dialogs (alert, confirm, prompt)
+/// </summary>
+public enum DialogHandlerAction
+{
+    /// <summary>
+    /// Automatically accept/OK all dialogs
+    /// </summary>
+    Accept,
+    
+    /// <summary>
+    /// Automatically dismiss/Cancel all dialogs
+    /// </summary>
+    Dismiss,
+    
+    /// <summary>
+    /// Do not handle dialogs automatically (may block test execution)
+    /// </summary>
+    Ignore
 }

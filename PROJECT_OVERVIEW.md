@@ -58,6 +58,7 @@ Holds all configuration parameters:
 - Screenshot settings (path, on error)
 - Results output path
 - Network idle detection settings
+- Dialog handler action (accept, dismiss, ignore)
 - URL exclusion patterns
 
 ### 2. WebTester Class
@@ -236,6 +237,7 @@ It also monitors:
    - Auto-discovery of interactive elements
    - Visibility and enabled state verification
    - Safe click with error handling
+   - JavaScript click fallback for overlapped elements
    - Recovery from failures
 
 5. **Error Detection**
@@ -246,25 +248,33 @@ It also monitors:
    - Before/after combined screenshot capture
    - Element highlighting in screenshots
 
-6. **URL Management**
+6. **JavaScript Dialog Handling**
+
+   - Automatic accept/dismiss of alerts
+   - Configurable confirm dialog responses
+   - Prompt handling
+   - Prevents test blocking on dialogs
+
+7. **URL Management**
 
    - Domain-aware navigation
    - URL exclusion patterns (wildcards supported)
    - Exclude login page option
    - Start URL configuration
 
-7. **Reporting**
+8. **Reporting**
 
    - Real-time console output with detailed element info
    - Detailed JSON reports
    - Success/failure statistics
    - Combined before/after screenshot gallery
 
-8. **Configuration**
+9. **Configuration**
    - Command-line arguments
    - JSON configuration files
    - Flexible parameter options
    - Network idle detection settings
+   - Dialog handler configuration
 
 ### 🔮 Future Enhancements
 

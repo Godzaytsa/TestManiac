@@ -39,6 +39,7 @@ echo   --timeout ^<ms^>               Navigation timeout
 echo   --click-timeout ^<ms^>         Click timeout
 echo   --screenshot-path ^<path^>     Screenshots folder
 echo   --results-path ^<path^>        Results JSON folder
+echo   --dialog-handler ^<action^>    Handle dialogs: accept, dismiss, ignore
 echo   --no-screenshots             Disable screenshots
 echo.
 exit /b 1

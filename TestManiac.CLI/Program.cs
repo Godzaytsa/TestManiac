@@ -47,6 +47,7 @@ class Program
             Console.WriteLine($"  Screenshot on Error: {config.ScreenshotOnError}");
             Console.WriteLine($"  Screenshot Path: {config.ScreenshotPath ?? string.Empty}");
             Console.WriteLine($"  Results Path: {config.ResultsPath ?? string.Empty}");
+            Console.WriteLine($"  Dialog Handler: {config.DialogHandler}");
             Console.WriteLine();
 
             // Run tests
@@ -236,6 +237,19 @@ class Program
                     config.ScreenshotOnError = false;
                     break;
 
+                case "--dialog-handler":
+                    if (i + 1 < args.Length)
+                    {
+                        config.DialogHandler = args[++i].ToLower() switch
+                        {
+                            "accept" => DialogHandlerAction.Accept,
+                            "dismiss" => DialogHandlerAction.Dismiss,
+                            "ignore" => DialogHandlerAction.Ignore,
+                            _ => DialogHandlerAction.Accept
+                        };
+                    }
+                    break;
+
                 case "--exclude-url":
                     if (i + 1 < args.Length)
                         config.ExcludeUrls.Add(args[++i]);
@@ -336,6 +350,7 @@ class Program
         Console.WriteLine("  --screenshot-path <path>       Path to save screenshots (default: ./screenshots)");
         Console.WriteLine("  --results-path <path>          Path to save test results JSON (default: current directory)");
         Console.WriteLine("  --no-screenshots               Disable screenshots on errors");
+        Console.WriteLine("  --dialog-handler <action>      How to handle dialogs: accept, dismiss, ignore (default: accept)");
         Console.WriteLine("  --exclude-url <pattern>        URL pattern to exclude (can be used multiple times)");
         Console.WriteLine("  --exclude-login-page [bool]    Exclude login page from testing (default: true)");
         Console.WriteLine("  -h, --help                     Show this help message");

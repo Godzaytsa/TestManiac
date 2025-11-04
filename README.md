@@ -11,6 +11,7 @@
 ✅ **Before/After Screenshots** - Captures combined screenshots showing element before click and page after error  
 ✅ **JavaScript Click Fallback** - Automatically retries with JS click when elements are overlapped  
 ✅ **Network Idle Detection** - Waits for background API calls to complete before checking for errors  
+✅ **Dialog Handler** - Automatically accepts, dismisses, or ignores JavaScript alerts/confirms/prompts  
 ✅ **Login Support** - Optional login with configurable credentials  
 ✅ **Multiple Browsers** - Supports Chromium, Firefox, and WebKit  
 ✅ **Detailed Reports** - JSON output with comprehensive test results  
@@ -96,6 +97,7 @@ Options:
   --click-timeout <ms>           Click timeout in ms (default: 5000)
   --screenshot-path <path>       Path to save screenshots (default: ./screenshots)
   --results-path <path>          Path to save test results JSON (default: current directory)
+  --dialog-handler <action>      How to handle dialogs: accept, dismiss, ignore (default: accept)
   --no-screenshots               Disable screenshots on errors
   -h, --help                     Show help message
 ```
@@ -170,6 +172,7 @@ Create a JSON file with your test configuration:
   "screenshotOnError": true,
   "screenshotPath": "./screenshots",
   "resultsPath": "./test-results",
+  "dialogHandler": "Accept",
   "excludeUrls": ["/logout", "/admin/*"],
   "excludeLoginPage": true
 }
