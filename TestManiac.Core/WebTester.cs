@@ -596,7 +596,7 @@ public class WebTester : IAsyncDisposable
         {
             // Get element text content
             var textContent = await element.TextContentAsync();
-            
+
             // Get href attribute if it's a link
             var href = await element.GetAttributeAsync("href");
 
@@ -606,7 +606,7 @@ public class WebTester : IAsyncDisposable
                 try
                 {
                     // Check text content
-                    if (!string.IsNullOrWhiteSpace(textContent) && 
+                    if (!string.IsNullOrWhiteSpace(textContent) &&
                         System.Text.RegularExpressions.Regex.IsMatch(textContent, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                     {
                         Log($"Excluding element with text '{textContent.Trim()}' (matches pattern: {pattern})");
@@ -614,7 +614,7 @@ public class WebTester : IAsyncDisposable
                     }
 
                     // Check href attribute
-                    if (!string.IsNullOrWhiteSpace(href) && 
+                    if (!string.IsNullOrWhiteSpace(href) &&
                         System.Text.RegularExpressions.Regex.IsMatch(href, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
                     {
                         Log($"Excluding element with href '{href}' (matches pattern: {pattern})");
