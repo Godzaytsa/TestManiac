@@ -1,7 +1,7 @@
 {
-  "baseUrl": "http://cedev-web-ce-ui.mscorp.com/Auto1",
-  "username": "SuperAdmin",
-  "password": "$uperAdmin_1",
+  "baseUrl": "",
+  "username": "",
+  "password": "",
   "usernameSelector": null,
   "passwordSelector": null,
   "loginButtonSelector": null,

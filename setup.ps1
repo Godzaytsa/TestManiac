@@ -1,19 +1,19 @@
 # TestManiac Setup Script
 # This script will build the project and install Playwright browsers
 
-Write-Host "╔══════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "║      TestManiac Setup Script         ║" -ForegroundColor Cyan
-Write-Host "╚══════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "      TestManiac Setup Script          " -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Check if .NET is installed
 Write-Host "Checking for .NET SDK..." -ForegroundColor Yellow
 try {
     $dotnetVersion = dotnet --version
-    Write-Host "✓ .NET SDK found: $dotnetVersion" -ForegroundColor Green
+    Write-Host "[OK] .NET SDK found: $dotnetVersion" -ForegroundColor Green
 }
 catch {
-    Write-Host "✗ .NET SDK not found!" -ForegroundColor Red
+    Write-Host "[ERROR] .NET SDK not found!" -ForegroundColor Red
     Write-Host "Please install .NET 8.0 SDK from: https://dotnet.microsoft.com/download" -ForegroundColor Red
     exit 1
 }
@@ -25,15 +25,15 @@ Write-Host "Building TestManiac..." -ForegroundColor Yellow
 try {
     dotnet build
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "✓ Build successful" -ForegroundColor Green
+        Write-Host "[OK] Build successful" -ForegroundColor Green
     }
     else {
-        Write-Host "✗ Build failed" -ForegroundColor Red
+        Write-Host "[ERROR] Build failed" -ForegroundColor Red
         exit 1
     }
 }
 catch {
-    Write-Host "✗ Build failed: $_" -ForegroundColor Red
+    Write-Host "[ERROR] Build failed: $_" -ForegroundColor Red
     exit 1
 }
 
@@ -47,22 +47,22 @@ try {
     Pop-Location
     
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "✓ Playwright browsers installed successfully" -ForegroundColor Green
+        Write-Host "[OK] Playwright browsers installed successfully" -ForegroundColor Green
     }
     else {
-        Write-Host "⚠ Playwright installation completed with warnings" -ForegroundColor Yellow
+        Write-Host "[WARNING] Playwright installation completed with warnings" -ForegroundColor Yellow
     }
 }
 catch {
-    Write-Host "✗ Failed to install Playwright browsers: $_" -ForegroundColor Red
+    Write-Host "[ERROR] Failed to install Playwright browsers: $_" -ForegroundColor Red
     Pop-Location
     exit 1
 }
 
 Write-Host ""
-Write-Host "╔══════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║        Setup Complete! 🎉            ║" -ForegroundColor Green
-Write-Host "╚══════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
+Write-Host "        Setup Complete!                " -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "You can now run TestManiac with:" -ForegroundColor Cyan
 Write-Host "  dotnet run --project TestManiac.CLI -- --url https://example.com --visible" -ForegroundColor White
